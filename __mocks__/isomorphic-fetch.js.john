@@ -1,0 +1,144 @@
+"use strict";
+
+import { config } from '../src/config'
+import { logajohn } from '../src/lib/logajohn'
+
+logajohn.setLevel(config.DEBUG_LEVEL)
+logajohn.debug('__mocks__/isomorphic-fetch.js: logajohn.getLevel()=', logajohn.getLevel())
+
+let sWhere = '__mocks__/isomorphic-fetch.js'
+
+//function ResponseWrapper(body, init) {
+//  if (body && typeof body.constructor === 'function' && body.constructor.__isFallback) {
+//    const response = new ActualResponse(null, init)
+//    response.body = body
+//
+//    const actualClone = response.clone
+//    response.clone = () => {
+//      const clone = actualClone.call(response)
+//      const [body1, body2] = body.tee()
+//      response.body = body1
+//      clone.body = body2
+//      return clone
+//    }
+//
+//    return response
+//  }
+//
+//  return new ActualResponse(body, init)
+//}
+
+function ResponseWrapper(body, init){
+    return new JResponse(body);
+}
+
+class JResponse {
+    constructor(body, init){ 
+        logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.constructor(): SHEMP: Moe, body arg = ', body )
+        this.body = body
+        this.init = init
+        logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.constructor(): SHEMP: Moe, this.body (direct assign from arg) = ', this.body )
+        logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.constructor(): SHEMP: Moe, this.init = ', this.init )
+        this.json = this.json.bind(this)
+    }
+
+    // Body.json()
+    // Takes a Response stream and reads it to completion.
+    // It returns a promise that resolves with the result of parsing the body text as JSON.
+    // (Returns a JavaScript object...)
+    json(){ 
+        logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.json(): SHEMP: Moe, this = ', this )
+        logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.json(): SHEMP: Moe, this.body = ', this.body )
+        logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.json(): SHEMP: Moe, (typeof this.body) = \'' + (typeof this.body) + '\'')
+        logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.json(): SHEMP: Moe, this.body.constructor = \'', this.body.constructor + '\'' )
+
+        let returno = JSON.parse(this.body)
+        logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.json(): SHEMP: Moe, retoynin\' returno = ', returno )
+        return Promise.resolve( returno )
+        return returno;
+    }
+}
+
+//function JResponse(body){
+//    // Use spread operator to clone body...rather than using Object.assign({}, body)...
+//    this.body = {...body}
+//    logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse()<constructor>: SHEMP: Moe, this = ', this )
+//    logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse()<constructor>: SHEMP: Moe, this.body = ', this.body )
+//}
+
+//JResponse.prototype.json = function(){ 
+//   logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.prototype.json(): SHEMP: Moe, this = ', this )
+//   logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.prototype.json(): SHEMP: Moe, retoynin\' this.body = ', this.body )
+//   return this.body
+//}
+
+
+const fetch = jest.fn();
+
+//const fetch = jest.fn().mockImplementation( (url, options)=>{
+//    let sWho = sWhat + ': fetchMockImplementation'
+//    logajohn.debug(`${sWho}(): invoked with url = ${url}, options = `, options )
+//})
+
+//fetch.Headers = Headers
+//fetch.Response = ResponseWrapper
+//fetch.Request = Request
+
+fetch.mockResponse = (body, init) => {
+
+  let sWho = sWhere + ': fetch.mockResponse'
+  logajohn.debug(sWho + ' SHEMP: Moe, body = ', body, ', init = ', init )
+
+  return fetch.mockImplementation((url, options) => {
+
+    let sWho = sWhere + ': fetch.mockResponse::fetch.mockImplementation(url, options)'
+    logajohn.debug(`${sWho}: SHEMP: Moe, I was called wit' url='${url}', and wit' options = `, options, '...' )
+    logajohn.debug(sWho + '(): Calling Promise.resolve(new JResponse(body, init)), with body=', body, ', and init = ', init)
+
+    Promise.resolve(new JResponse(body, init))
+    //Promise.resolve(new ResponseWrapper(body, init))
+  })
+}
+
+fetch.mockReject = error => {
+  return fetch.mockImplementation(() => Promise.reject(error))
+}
+
+fetch.resetMocks = () => {
+  fetch.mockReset()
+}
+
+// Default mock is just a empty string.
+fetch.mockResponse('')
+
+module.exports = fetch
+
+//
+//const mockFetch = jest.fn(
+//    (url, options)=>{
+//
+//        logajohn.debug('./__mocks__/isomorphic-fetch.js: mockFetch(): url =', url)
+//        logajohn.debug('./__mocks__/isomorphic-fetch.js: mockFetch(): options =', options)
+//
+//	    return new Promise((resolve,reject)=>{ 
+//	        //if (filter == null) {
+//	        //    reject(new Error('You supplied a null filter...'))
+//	        //}
+//	        resolve({ output: faux_action, json: function(){ return output} })
+//	    })
+//})
+//
+//exports.mockFetch = mockFetch
+//
+//exports.fetch = mockFetch
+//
+//const mockFetchSetOutput = (output) => {
+//    output = output
+//}
+//
+//exports.mockFetchSetOutput = mockFetchSetOutput
+//
+//export default mockFetch
+//
+
+

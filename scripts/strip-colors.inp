@@ -1,0 +1,8 @@
+ RUNS  ...actions.test.js
+[K[1A[K[1A
+ RUNS  ...actions.test.js
+[K[1A[K[1ATest Suites: 1 failed, 1 total
+Tests:       2 failed, 2 total
+Snapshots:   0 total
+Time:        0.258s, estimated 1s
+Ran all test suites matching /actions.test.js/i.
