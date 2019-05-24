@@ -24,7 +24,7 @@ global.Enzyme = Enzyme
 // jefflau's version...
 //global.fetch = require('jest-fetch-mock')
 
-window.localStorage = {}
+//window.localStorage = {}
 console.groupCollapsed = jest.fn()
 console.log = jest.fn()
 console.groupEnd = jest.fn()

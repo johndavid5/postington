@@ -103,11 +103,13 @@
   "jest": {
     "setupFiles": [
       "./__tests__/shim.js",
-      "./__tests__/global.js"
+      "./__tests__/global.js",
+      "./__tests__/setup.js"
     ],
     "modulePathIgnorePatterns": [
       "shim.js",
       "global.js",
+      "setup.js",
       "build",
       "~",
       ".swp",
@@ -141,6 +143,7 @@
     },
     "moduleNameMapper": {
       "\\.(scss)$": "<rootDir>/node_modules/jest-css-modules"
-    }
+    },
+    "testEnvironment": "node"
   }
 }

@@ -21,9 +21,13 @@ describe('<PostsFilterForm /> UI Component', () => {
 
     let sWhat = `${sWhere}::<PostsFilterForm /> UI Component`
 
-    it.skip('renders submit button', () =>{
+    it('renders submit button', () =>{
         let sWho = `${sWhat}::renders submit button`
-        let postsFilterFormWrapper = mount(<PostsFilterForm props />)
+
+        // PostsFilterForm calls onPostsFetch() in componentDidMount(), and expects it to return a Promise...
+        const _onPostsFetchSpy = jest.fn(()=>{return Promise.resolve('OK')})
+
+        let postsFilterFormWrapper = mount(<PostsFilterForm onPostsFetch={_onPostsFetchSpy} />)
         logajohn.debug(`${sWho}: postsFilterFormWrapper.debug() =\n${postsFilterFormWrapper.debug()}...`)
         //logajohn.debug(`${sWho}: postsFilterFormWrapper.html() = ${JSON.stringify(postsFilterFormWrapper.html(), null, ' ')}...`)
         //logajohn.debug(`${sWho}: postsFilterFormWrapper.state() = ${JSON.stringify(postsFilterFormWrapper.state(), null, ' ')}...`)
@@ -40,23 +44,29 @@ describe('<PostsFilterForm /> UI Component', () => {
     })
 
 
-    it.skip("submit invokes onPostsFilter", () => {
+    it("submit invokes onPostsFilter", () => {
 
         let sWho = `${sWhere}: submit invokes onPostsFilter`
 
         const _onPostsFilter = jest.fn()
-        mount(<PostsFilterForm onPostsFilter={_onPostsFilter} />)
+        // PostsFilterForm calls onPostsFetch() in componentDidMount(), and expects it to return a Promise...
+        const _onPostsFetchSpy = jest.fn(()=>{return Promise.resolve('OK')})
+
+        mount(<PostsFilterForm onPostsFetch={_onPostsFetchSpy} onPostsFilter={_onPostsFilter} />)
             .find('#load-posts')
             .simulate('submit')
         expect(_onPostsFilter).toBeCalled()
     })
 
 
-    it.skip("submit invokes onPostsFilter -- with user_id_filter, title_filter and body_filter passed along -- and with sort filters preserved", () => {
+    it("submit invokes onPostsFilter -- with user_id_filter, title_filter and body_filter passed along -- and with sort filters preserved", () => {
 
         let sWho = `${sWhere}: submit invokes onPostsFilter -- with title_filter and body_filter passed along -- and with sort filters preserved`
 
         const _onPostsFilter = jest.fn() // mock _onPostsFilter...
+
+        // PostsFilterForm calls onPostsFetch() in componentDidMount(), and expects it to return a Promise...
+        const _onPostsFetchSpy = jest.fn(()=>{return Promise.resolve('OK')})
 
         let s_faux_user_id_filter = '3'
         let s_faux_title_filter = 'secula'
@@ -75,6 +85,7 @@ describe('<PostsFilterForm /> UI Component', () => {
             userIdFilter={s_faux_user_id_filter}
             titleFilter={s_faux_title_filter}
             bodyFilter={s_faux_body_filter}
+            onPostsFetch={_onPostsFetchSpy}
             onPostsFilter={_onPostsFilter}
             posts={{posts_filters: faux_posts_filters}}  />)
 
