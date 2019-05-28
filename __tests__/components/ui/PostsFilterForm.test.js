@@ -21,7 +21,37 @@ describe('<PostsFilterForm /> UI Component', () => {
 
     let sWhat = `${sWhere}::<PostsFilterForm /> UI Component`
 
-    it('renders submit button', () =>{
+    it('When component mounts, calls onPostsFetch() and filterIt()...', (done) =>{
+
+        let sWho = `${sWhat}::When component mounts, calls onPostsFetch() and filterIt()...`
+
+        // PostsFilterForm calls onPostsFetch() in componentDidMount(), and expects it to return a Promise...
+        // then, in the .then(), it calls filterIt()...
+        const _onPostsFetchSpy = jest.fn(()=>{
+             let sWho = '_onPostsFetchSpy' 
+             logajohn.debug(`${sWho}: SHEMP: Moe, callin' Promise.resolve('OK')...`)
+             return Promise.resolve('OK')
+           }
+        )
+
+        // NOTE: Since componentDidMount() happens asynchronously during mount(),
+        // we'll check on both spies in _filterItSpy itself, which should be
+        // the last spy that runs...clever...? or crazy...?
+        const _filterItSpy = jest.fn(()=>{
+             let sWho = '_filterItSpy' 
+             logajohn.debug(`${sWho}: SHEMP: Moe, checkin' on da spies now...`)
+             expect(_onPostsFetchSpy).toHaveBeenCalledTimes(1)
+             expect(_filterItSpy).toHaveBeenCalledTimes(1)
+             done()
+        })
+
+        _filterItSpy.mockClear()
+        _onPostsFetchSpy.mockClear()
+
+        let postsFilterFormWrapper = mount(<PostsFilterForm onPostsFetch={_onPostsFetchSpy} filterItSpy={_filterItSpy} />)
+    })
+
+    it('renders submit button, user-id-filter, title-filter, and body-filter...', () =>{
         let sWho = `${sWhat}::renders submit button`
 
         // PostsFilterForm calls onPostsFetch() in componentDidMount(), and expects it to return a Promise...
@@ -41,6 +71,10 @@ describe('<PostsFilterForm /> UI Component', () => {
         //}
         //expect(mount(<PostsFilterForm />).find('#load-posts').length).toBe(1)
         expect(postsFilterFormWrapper.find('#load-posts').length).toBe(1)
+
+        expect(postsFilterFormWrapper.find('#user-id-filter').length).toBe(1)
+        expect(postsFilterFormWrapper.find('#title-filter').length).toBe(1)
+        expect(postsFilterFormWrapper.find('#body-filter').length).toBe(1)
     })
 
 
@@ -99,15 +133,15 @@ describe('<PostsFilterForm /> UI Component', () => {
         expect(body_filter_wrapper.at(0).props().value).toEqual(s_faux_body_filter) // Confirm value of #body-filter set via props...
 
         logajohn.debug(`${sWho}(): SHEMP: Moe, body_filter_wrapper = `, body_filter_wrapper )
-        logajohn.debug(`${sWho}(): SHEMP: Shmoe, body_filter_wrapper.at(0) = `, body_filter_wrapper.at(0) )
-        logajohn.debug(`${sWho}(): SHEMP: Shmoe, body_filter_wrapper.at(0).props() = `, body_filter_wrapper.at(0).props() )
-        logajohn.debug(`${sWho}(): SHEMP: Shmoe, body_filter_wrapper.at(0).props().value = `, body_filter_wrapper.at(0).props().value )
-        logajohn.debug(`${sWho}(): SHEMP: Shmoe, body_filter_wrapper.at(0).text() = `, body_filter_wrapper.at(0).text() )
+        logajohn.debug(`${sWho}(): SHEMP: Moe, body_filter_wrapper.at(0) = `, body_filter_wrapper.at(0) )
+        logajohn.debug(`${sWho}(): SHEMP: Moe, body_filter_wrapper.at(0).props() = `, body_filter_wrapper.at(0).props() )
+        logajohn.debug(`${sWho}(): SHEMP: Moe, body_filter_wrapper.at(0).props().value = `, body_filter_wrapper.at(0).props().value )
+        logajohn.debug(`${sWho}(): SHEMP: Moe, body_filter_wrapper.at(0).text() = `, body_filter_wrapper.at(0).text() )
 
         wrapper.find('#load-posts')
                 .simulate('submit')
 
-        logajohn.debug(`${sWho}(): _onPostsFilter.calls = `,  _onPostsFilter.calls )
+        logajohn.debug(`${sWho}(): _onPostsFilter.mock.calls = `,  _onPostsFilter.mock.calls )
 
         // All-in-one expect gives less useful error...
         expect(_onPostsFilter).toBeCalledWith({user_id_filter: s_faux_user_id_filter, title_filter: s_faux_title_filter, body_filter: s_faux_body_filter, ...faux_posts_filters})
@@ -156,6 +190,50 @@ describe('<PostsFilterForm /> UI Component', () => {
 
         expect(_filterItSpy).toHaveBeenCalledTimes(1)
         expect(_autoSuggestUpdateSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('When props.posts.post_is_editing_id changes(due to beginning or ending an edit), updates state.postIsEditingId and state.postIsEditingPost to reflect props.posts.posts_is_editing_id and props.posts.post_is_editing_post...', ()=>{
+        
+        let sWho = `${sWhere}: 'When props.posts.post_is_editing_id changes(due to beginning or ending an edit), updates state.postIsEditingId and state.postIsEditingPost to reflect props.posts.posts_is_editing_id and props.posts.post_is_editing_post...'`
+
+        // PostsFilterForm calls onPostsFetch() in componentDidMount(), and expects it to return a Promise...
+        const _onPostsFetchSpy = jest.fn(()=>{return Promise.resolve('OK')})
+
+        // Use to confirm componentDidUpdate() was called,
+        // and also to spy on state since wrapper.instance().state()
+        // isn't working...
+        const _componentDidUpdateSpy = jest.fn()
+
+        let postsInitial = {}
+
+        let postsFilterFormWrapper = mount(<PostsFilterForm posts={postsInitial} onPostsFetch={_onPostsFetchSpy} componentDidUpdateSpy={_componentDidUpdateSpy} />)
+
+        logajohn.debug(`${sWho}: BEFORE: postsFilterFormWrapper.state() = ${JSON.stringify(postsFilterFormWrapper.state(), null, ' ')}...`)
+        logajohn.debug(`${sWho}: BEFORE: postsFilterFormWrapper.instance.state = ${JSON.stringify(postsFilterFormWrapper.instance.state, null, ' ')}...`)
+
+        let postsPropsNew = { post_is_editing_id: 27, post_is_editing_post: { name: 'Moe' } }
+
+        logajohn.debug(`${sWho}(): SHEMP: Callin' wrapper.setProps({posts: postsPropsNew=`, postsPropsNew, `})...`)
+        postsFilterFormWrapper.setProps({ posts: postsPropsNew })
+        postsFilterFormWrapper.update()
+
+        let iLength = _componentDidUpdateSpy.mock.calls.length
+        logajohn.debug(`${sWho}(): AFTER: SPOCK: Captain, _componentDidUpdateSpy.mock.calls.length = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls.length, ' ') )
+        for( let i = 0 ; i < iLength; i++ ){
+            logajohn.debug(`${sWho}(): AFTER: SPOCK: Captain, _componentDidUpdateSpy.mock.calls[${i}] = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls[i], ' ') )
+        }
+
+        expect(_componentDidUpdateSpy.mock.calls[iLength-1][0]['currState']['postIsEditingId']).toEqual( postsPropsNew.post_is_editing_id )
+        expect(_componentDidUpdateSpy.mock.calls[iLength-1][0]['currState']['postIsEditingPost']).toEqual( postsPropsNew.post_is_editing_post )
+
+        // This yielded an instance, but state was buried in the JSON structure...
+        // logajohn.debug(`${sWho}: AFTER: postsFilterFormWrapper.find(PostsFilterForm).instance() = `, utils.customStringify(postsFilterFormWrapper.find(PostsFilterForm).instance(), ' ') )
+
+        // This did not yield a state...
+        //logajohn.debug(`${sWho}: AFTER: postsFilterFormWrapper.find(PostsFilterForm).instance().state = `, utils.customStringify(postsFilterFormWrapper.find(PostsFilterForm).instance().state, ' ') )
+        //expect(postsFilterFormWrapper.find(PostsFilterForm).instance().state).toEqual({
+        //    bar: 'here is the state!'
+        //})
 
     })
 

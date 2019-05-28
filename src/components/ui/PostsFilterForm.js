@@ -76,7 +76,12 @@ class PostsFilterForm extends Component {
     // Yes, I'm using state derived from props for
     // state.postIsEditingPost and state.postIsEditingId derived from props...doing a redux action for
     // each keystroke seems to take too long to update when editing the props...
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevState) {
+
+        if( this.props.componentDidUpdateSpy ){
+            // You can use this intrusive spy to check on calls to componentDidUpdate, and also to ascertain state...
+            this.props.componentDidUpdateSpy({'prevProps': {...prevProps}, 'currProps': {...this.props}, 'prevState': {...prevState}, 'currState': {...this.state}})
+        }
 
         let sWho = "PostsFilterForm::componentDidUpdate"
 
@@ -158,23 +163,19 @@ class PostsFilterForm extends Component {
 
     }/* filterIt() */
 
-    /* Load filtered posts as soon as the component mounts...as if the user hit the button... */
+    /* Load filtered posts as soon as the component mounts...as if the user hit the submit button... */
+    /* Returns a Promise to allow tests to wait on it... */
     componentDidMount(){
-        let sWho = "PostsFilterForm::componentDidMount";
-        const { onPostsFetch } = this.props; // Get dispatch method from props...
-        //logajohn.debug(`${sWho}(): Calling this.filterIt(onPostsFetch), Moe...`);
-
-        //this.filterIt(onPostsFetch);
-
-        // Explicitly supply onPostsFetch() function to fetch data from server this one time...
-        // the rest of the time we call this.filterIt() with no argument and do a local
-        // filter...
-        logajohn.info(`${sWho}(): Calling onPostsFetch(), Moe...`);
-        onPostsFetch()
-        .then(()=>{
-            logajohn.info(`${sWho}(): .then calling this.filterIt(), Moe...`);
-            this.filterIt();
-        })
+	        let sWho = "PostsFilterForm::componentDidMount";
+	        const { onPostsFetch } = this.props; // Get dispatch method from props...
+	
+	        logajohn.info(`${sWho}(): Calling onPostsFetch(), Moe...`);
+	
+	        onPostsFetch()
+	        .then(()=>{
+	            logajohn.info(`${sWho}(): onPostsFetch().then calling this.filterIt(), Moe...`)
+	            this.filterIt()
+	        })
     }
 
     // Should update state key to equal new value of corresponding component name... 
