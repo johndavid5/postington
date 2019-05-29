@@ -66,10 +66,6 @@ class PostsFilterForm extends Component {
 
         this.autoSuggestUpate =this.autoSuggestUpdate.bind(this);
 
-        this.handleTitleEdit = this.handleTitleEdit.bind(this);
-        this.handleTitleEditSubmit = this.handleTitleEditSubmit.bind(this);
-        this.handleTitleEditCancel = this.handleTitleEditCancel.bind(this);
-
         this.autoSuggestGetSuggestions = this.autoSuggestGetSuggestions.bind(this);
     }
 
@@ -185,6 +181,11 @@ class PostsFilterForm extends Component {
 
 	    const target = event.target;
         //logajohn.debug(`${sWho}(): target = `, customStringify(target) )
+        
+        logajohn.debug(`${sWho}(): target.name = `, target.name )
+        logajohn.debug(`${sWho}(): target.type = `, target.type )
+        logajohn.debug(`${sWho}(): target.value = `, target.value )
+        logajohn.debug(`${sWho}(): target.checked = `, target.checked )
 
 	    const value = target.type === 'checkbox' ? target.checked : target.value;
         logajohn.debug(`${sWho}(): value = `, customStringify(value) )
@@ -199,7 +200,7 @@ class PostsFilterForm extends Component {
         logajohn.debug(`${sWho}(): stateSetter = `, customStringify(stateSetter) )
 
 	    this.setState( stateSetter, ()=>{
-            // overkill?
+            // overkill...?
             // this.filterIt()
         })
 
@@ -280,52 +281,6 @@ class PostsFilterForm extends Component {
         })
     }
 
-    handleTitleEdit(event) {
-
-        let sWho = "PostsFilterForm::handleTitleEdit"
-
-	    const target = event.target;
-        //logajohn.debug(`${sWho}(): target = `, customStringify(target) )
-
-	    const newTitleValue = target.value;
-        //logajohn.debug(`${sWho}(): value = `, customStringify(value) )
-        //logajohn.debug(`${sWho}(): this.props.posts = `, this.props.posts )
-
-        //let postEdited = { ...this.state.postIsEditingPost, title: value }
-        //let postEdited = { ...this.props.posts.post_is_editing_post, title: value }
-
-        this.setState( (state, props)=>{
-            let stateChanger = {   
-                postIsEditingPost: { ...state.postIsEditingPost, title: newTitleValue }
-            }
-            return stateChanger
-        })
-
-        //let { onPostEditChange }  = this.props
-	    //onPostEditChange( this.props.posts.post_is_editing_id, postEdited ) 
-
-    }/* handleTitleEdit() */
-
-    handleTitleEditCancel(event) {
-
-        let sWho = "PostsFilterForm::handleTitleEditCancel"
-
-        let { onPostEditCancel }  = this.props
-	    onPostEditCancel( this.props.posts.post_is_editing_id )
-
-    }
-
-    handleTitleEditSubmit(event) {
-
-        let sWho = "PostsFilterForm::handleTitleEditSubmit"
-
-        let { onPostEditFinish }  = this.props
-
-	    onPostEditFinish( this.props.posts.post_is_editing_id,  this.state.postIsEditingPost )
-
-        // We should re-filter, including any changes in the filter fields...
-        this.filterIt() 
-    }
 
     // Calculate suggestions for any given input value and field key...
     autoSuggestGetSuggestions(value, field){
@@ -400,53 +355,6 @@ class PostsFilterForm extends Component {
             <label htmlFor="full-name-filter" style={{marginLeft: '4px', marginRight: '2px'}}>Body Filter:</label>
             <input type="search" className="form-control" id="body-filter" name="bodyFilter" aria-label="Body Filter" value={this.state.bodyFilter} onChange={this.handleInputChange} />
          </div>
-
-
-        {1==0 && this.props.posts.post_is_editing ? 
-            <div className="panel panel-default" style={
-                {width: '70%', marginTop: '1em',
-                 //opacity: '1.0',
-                 //zOrder: 10,
-                 //position: '-webkit-sticky',
-                 //position: 'sticky',
-                 //position: 'absolute',
-                 //top: 0,
-                 padding: '5px',
-                 backgroundColor: '#cae8ca',
-                 border: '2px solid #4CAF50'
-                }
-            }>
-                  <div className="panel-heading">
-                    <h3 className="panel-title" style={{textAlign: 'center', fontWeight: 'bold'}}>Edit Post</h3>
-                  </div>
-                  <div className="panel-body">
-                    <form className="post-edit-form form-inline">
-         <div className="form-group">
-            <label htmlFor="user-id-edit" style={{marginLeft: '4px', marginRight: '2px'}}>User ID:</label>
-            <input type="static" style={{backgroundColor: 'inherit'}} className="form-control" id="user-id-edit" name="userIdEdit" aria-label="User ID" value={this.props.posts.post_is_editing_post.userId}/>
-         </div>
-         <div className="form-group">
-            <label htmlFor="title-edit" style={{marginLeft: '4px', marginRight: '2px'}}>Title:</label>
-            <input type="text" className="form-control" id="title-edit" name="titleEdit" aria-label="Title Edit"
-                               size="40"
-                               value={this.state.postIsEditingPost.title}
-                               onChange={this.handleTitleEdit} />
-         </div>
-         <div className="form-group">
-            <label htmlFor="body-static" style={{marginLeft: '4px', marginRight: '2px'}}>Body:</label>
-            <pre id="body-static" style={{marginLeft: '4px', marginRight: '2px', backgroundColor: 'inherit'}}>
-            {this.props.posts.post_is_editing_post.body}
-            </pre>
-         </div>
-                    </form>
-                  </div>
-                  <div className="panel-footer">
-                    <button class="btn btn-success" onClick={this.handleTitleEditSubmit}>OK</button>   <button class="btn btn-default" onClick={this.handleTitleEditCancel}>Cancel</button>
-                  </div>
-            </div>
-         :
-           ""
-         }
 
         </form>
         <hr/>

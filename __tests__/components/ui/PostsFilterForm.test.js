@@ -226,15 +226,44 @@ describe('<PostsFilterForm /> UI Component', () => {
         expect(_componentDidUpdateSpy.mock.calls[iLength-1][0]['currState']['postIsEditingId']).toEqual( postsPropsNew.post_is_editing_id )
         expect(_componentDidUpdateSpy.mock.calls[iLength-1][0]['currState']['postIsEditingPost']).toEqual( postsPropsNew.post_is_editing_post )
 
-        // This yielded an instance, but state was buried in the JSON structure...
-        // logajohn.debug(`${sWho}: AFTER: postsFilterFormWrapper.find(PostsFilterForm).instance() = `, utils.customStringify(postsFilterFormWrapper.find(PostsFilterForm).instance(), ' ') )
+    })
 
-        // This did not yield a state...
-        //logajohn.debug(`${sWho}: AFTER: postsFilterFormWrapper.find(PostsFilterForm).instance().state = `, utils.customStringify(postsFilterFormWrapper.find(PostsFilterForm).instance().state, ' ') )
-        //expect(postsFilterFormWrapper.find(PostsFilterForm).instance().state).toEqual({
-        //    bar: 'here is the state!'
-        //})
 
+    it('When user-id-filter changes, handleInputChange() updates the state.userIdFilter correctly...', ()=>{
+        
+        let sWho = `${sWhere}: 'When user-id-filter changes, handleInputChange() updates the state properly...'`
+
+        // PostsFilterForm calls onPostsFetch() in componentDidMount(), and expects it to return a Promise...
+        const _onPostsFetchSpy = jest.fn(()=>{return Promise.resolve('OK')})
+
+        // Use to confirm componentDidUpdate() was called,
+        // and also to spy on state since wrapper.instance().state()
+        // isn't working...
+        const _componentDidUpdateSpy = jest.fn()
+
+        let postsInitial = {}
+
+        let postsFilterFormWrapper = mount(<PostsFilterForm posts={postsInitial} onPostsFetch={_onPostsFetchSpy} componentDidUpdateSpy={_componentDidUpdateSpy} />)
+
+        expect(postsFilterFormWrapper.find('#user-id-filter').length).toBe(1)
+
+        let userIdFilterWrapper = postsFilterFormWrapper.find('#user-id-filter')
+
+        logajohn.debug(`${sWho}(): SHEMP: BEFORE: Moe, userIdFilterWrapper.props() = `, userIdFilterWrapper.props() )
+
+        let fauxChangeEvent = { target: { name: 'userIdFilter', value: 'foo' }}
+        logajohn.debug(`${sWho}(): SHEMP: Moe, simulatin' 'change' event = `, fauxChangeEvent )
+        userIdFilterWrapper.simulate('change', fauxChangeEvent )
+
+        logajohn.debug(`${sWho}(): SHEMP: AFTER: Moe, userIdFilterWrapper.props() = `, userIdFilterWrapper.props() )
+
+        let iLength = _componentDidUpdateSpy.mock.calls.length
+        logajohn.debug(`${sWho}(): AFTER: SPOCK: Captain, _componentDidUpdateSpy.mock.calls.length = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls.length, ' ') )
+        for( let i = 0 ; i < iLength; i++ ){
+            logajohn.debug(`${sWho}(): AFTER: SPOCK: Captain, _componentDidUpdateSpy.mock.calls[${i}] = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls[i], ' ') )
+        }
+
+        expect(_componentDidUpdateSpy.mock.calls[iLength-1][0]['currState']['userIdFilter']).toEqual( fauxChangeEvent.target.value )
     })
 
 })

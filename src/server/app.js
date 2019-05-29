@@ -17,12 +17,8 @@ import posts_api from './posts-api'
 import App from '../components/App'
 import storeFactory from '../store'
 
-
 // Load initial state from the state we remember in ./data...?
 //import initialState from '../../data/initialState.json'
-
-// Or try some hack to load initial state from database...?
-//import initialState from './initialState'
 
 // Or start with a blank slate state...
 let initialState = {};

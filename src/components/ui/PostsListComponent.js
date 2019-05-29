@@ -321,7 +321,7 @@ class PostsListComponent extends Component {
           <h4 style={{color: 'purple', textAlign: 'center', margin: '0px'}}>{s_num_posts}Post{i_num_posts == 1 ? "": "s"}, Sir...</h4>
         </div>
         <div className="col-sm-4">
-          <h4 style={{color: 'purple', textAlign: 'center', margin: '0px'}}>Click to edit, Sir...</h4>
+          <h4 style={{color: 'purple', textAlign: 'center', margin: '0px'}}>Click Post to edit, Sir...</h4>
         </div>
       </div>
       <div>
