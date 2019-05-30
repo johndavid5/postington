@@ -99,10 +99,6 @@ export class Posts {
                let bFound = false
 
                if( filter['user_id_filter'] ){
-                 //strFinder = filter['user_id_filter']
-                 //strFindIn = post.userId
-                 //bFound = utils.strBeginsWithIgnoreCase( strFinder, strFindIn )
-                 //bFound = utils.strBeginsWithIgnoreCase( strFinder, strFindIn )
                  bFound = ( 1*post.userId == 1*filter['user_id_filter'] )
                  if( bFound == false ){
                     return false

@@ -4,6 +4,8 @@ jest.mock('react-router')
 
 import PostsFilterForm from '../../../src/components/ui/PostsFilterForm'
 
+import postsFixture from '../../models/fixtures/posts.json'
+
 const { shallow, mount } = Enzyme
 
 import { config } from '../../../src/config'
@@ -14,8 +16,6 @@ let sWhere = '__tests__/components/ui/PostsFilterform.test.js'
 
 logajohn.setLevel(config.DEBUG_LEVEL)
 logajohn.debug(`${sWhere}: logajohn.getLevel()=${logajohn.getLevel()}...`)
-
-//logajohn.debug(`${sWhere}: PostsFilterForm = ${JSON.stringify(PostsFilterForm, null, ' ')}...`)
 
 describe('<PostsFilterForm /> UI Component', () => {
 
@@ -265,5 +265,61 @@ describe('<PostsFilterForm /> UI Component', () => {
 
         expect(_componentDidUpdateSpy.mock.calls[iLength-1][0]['currState']['userIdFilter']).toEqual( fauxChangeEvent.target.value )
     })
+
+
+    it('When title-filter changes, handleTitleFilterChange() updates state.titleFilter and state.titleFilterAutoSuggestArray, then when a title filter auto suggest is selected, it\'s copied into title-filter via handleTitleFilterAutoSuggestChange()...', ()=>{
+        
+        let sWho = `${sWhere}: 'When title-filter changes, handleTitleFilterChange() updates state and auto suggest properly...'`
+
+        // PostsFilterForm calls onPostsFetch() in componentDidMount(), and expects it to return a Promise...
+        const _onPostsFetchSpy = jest.fn(()=>{return Promise.resolve('OK')})
+
+        // Use to confirm componentDidUpdate() was called,
+        // and also to spy on state since wrapper.instance().state()
+        // isn't working...
+        const _componentDidUpdateSpy = jest.fn()
+
+        let postsProp = {remote_posts_list: [...postsFixture.array], posts_list: [...postsFixture.array]}
+        logajohn.debug(`${sWho}(): SHEMP: BEFORE: Moe, postsProp = `, postsProp )
+
+        let postsFilterFormWrapper = mount(<PostsFilterForm posts={postsProp} onPostsFetch={_onPostsFetchSpy} componentDidUpdateSpy={_componentDidUpdateSpy} />)
+
+        expect(postsFilterFormWrapper.find('#title-filter').length).toBe(1)
+        let titleFilterWrapper = postsFilterFormWrapper.find('#title-filter')
+
+        logajohn.debug(`${sWho}(): SHEMP: BEFORE: Moe, titleFilterWrapper.props() = `, titleFilterWrapper.props() )
+
+        let fauxChangeEvent = { target: { name: 'titleFilter', value: 'e' }}
+        logajohn.debug(`${sWho}(): SHEMP: Moe, simulatin' 'change' event = `, fauxChangeEvent )
+        titleFilterWrapper.simulate('change', fauxChangeEvent )
+
+        logajohn.debug(`${sWho}(): SHEMP: AFTER: Moe, titleFilterWrapper.props() = `, titleFilterWrapper.props() )
+
+        let iLength = _componentDidUpdateSpy.mock.calls.length
+        logajohn.debug(`${sWho}(): AFTER: SPOCK: Captain, _componentDidUpdateSpy.mock.calls.length = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls.length, ' ') )
+        for( let i = 0 ; i < iLength; i++ ){
+            logajohn.debug(`${sWho}(): AFTER: SPOCK: Captain, _componentDidUpdateSpy.mock.calls[${i}] = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls[i], ' ') )
+        }
+
+        expect(_componentDidUpdateSpy.mock.calls[iLength-1][0]['currState']['titleFilter']).toEqual( fauxChangeEvent.target.value )
+        expect(_componentDidUpdateSpy.mock.calls[iLength-1][0]['currState']['titleFilterAutoSuggestArray']).toEqual([
+            "ea molestias quasi exercitationem repellat qui ipsa sit aut",
+            "eum et est occaecati",
+        ])
+
+        // 'value' is zero-based index of corresponding this.state.titleFilterAutoSuggestArray... 
+        let fauxTitleFilterAutoSuggestChangeEvent = { target: { name: 'titleFilterAutoSuggest', value: 1 }}
+        logajohn.debug(`${sWho}(): SHEMP: Moe, simulatin' 'change' event = `, fauxTitleFilterAutoSuggestChangeEvent )
+
+        expect(postsFilterFormWrapper.find('#title-filter-auto-suggest').length).toBe(1)
+        let titleFilterAutoSuggestWrapper = postsFilterFormWrapper.find('#title-filter-auto-suggest')
+        titleFilterAutoSuggestWrapper.simulate('change', fauxTitleFilterAutoSuggestChangeEvent )
+
+        logajohn.debug(`${sWho}(): SHEMP: AFTER faux select: Moe, titleFilterWrapper.html() = `, titleFilterWrapper.html() )
+        logajohn.debug(`${sWho}(): SHEMP: AFTER faux select: Moe, Cheerio Wrapper, titleFilterWrapper.render() = `, utils.customStringify(titleFilterWrapper.render()) )
+        logajohn.debug(`${sWho}(): SHEMP: AFTER faux select: Moe, Cheerio Wrapper, titleFilterWrapper.render().attr('value') = `, utils.customStringify(titleFilterWrapper.render().attr('value')) )
+        expect(titleFilterWrapper.render().attr('value')).toEqual("eum et est occaecati")
+    })
+
 
 })

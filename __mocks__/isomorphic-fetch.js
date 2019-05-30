@@ -35,8 +35,10 @@ class JResponse {
         logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.constructor(): SHEMP: Moe, body arg = ', body )
         this.body = body
         this.init = init
+        this.status = 200
         logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.constructor(): SHEMP: Moe, this.body (direct assign from arg) = ', this.body )
         logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.constructor(): SHEMP: Moe, this.init = ', this.init )
+        logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.constructor(): SHEMP: Moe, this.status = ', this.status )
         this.json = this.json.bind(this)
     }
 
@@ -53,7 +55,7 @@ class JResponse {
         let returno = JSON.parse(this.body)
         logajohn.debug('__mocks__/isomorphic-fetch.js: JResponse.json(): SHEMP: Moe, retoynin\' returno = ', returno )
         return Promise.resolve( returno )
-        return returno;
+        //return returno;
     }
 }
 
