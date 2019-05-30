@@ -323,7 +323,7 @@ class PostsFilterForm extends Component {
         <hr/>
         <form className="posts-filter-form form-inline" onSubmit={this.submit}>
 
-         <button id="load-posts" type="submit" className="btn btn-success" aria-label="Load Posts">
+         <button id="load-posts" type="submit" className="btn btn-success" aria-label="Filter Posts" title="Filter the Posts, Sir...">
             {1==0?<span className="glyphicon glyphicon-refresh" aria-hidden="true" style={{fontWeight: 'bold'}}></span>:""}
             <img src="/postington/images/jeeves-headshot.jpg" style={{height: '40px'}} />
          </button>
