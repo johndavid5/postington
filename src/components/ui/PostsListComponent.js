@@ -223,7 +223,7 @@ class PostsListComponent extends Component {
 
             let sluggified_field = val.field.replace(/_/g, '-') // e.g., 'description-field'
 
-            let id=`static-${sluggified_field}`; // e.g., 'static-description-field' 
+            let id=`static-${sluggified_field}`; // e.g., 'static-title-filter' 
 
             if( gefilters.length > 0 ){
                 gefilters.push(<span style={gefilterStyle}>, and </span>)

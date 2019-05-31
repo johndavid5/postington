@@ -27,14 +27,14 @@
     "test-posts-mock": "jest --watch posts-mock.test.js",
     "test-posts-model": "jest --watch posts.test.js",
     "test-utils": "jest --watch utils.test.js",
-    "test-posts-list-component": "jest --watch PostsListComponent.test.js",
     "test-posts-list-component-container": "jest --watch PostsListComponentContainer.test.js",
     "test-actions": "jest --watch actions.test.js",
     "test-posts-reducers": "jest --watch posts-reducers.test.js",
     "test-posts-list-container": "jest --watch PostsListContainer.test.js",
     "test-posts-filter-form-container": "jest --watch PostsFilterFormContainer.test.js",
     "test-posts-filter-form": "jest --watch PostsFilterForm.test.js",
-    "test-posts-component": "jest --watch PostsComponent.test.js"
+    "test-posts-component": "jest --watch PostsComponent.test.js",
+    "test-posts-list-component": "jest --watch PostsListComponent.test.js"
   },
   "keywords": [
     "React",
