@@ -40,14 +40,14 @@ class PostsListComponent extends Component {
         this.sortBy = this.sortBy.bind(this)
         this.editStart = this.editStart.bind(this)
 
-        this.handleTitleEdit = this.handleTitleEdit.bind(this);
+        this.handleTitleEditChange = this.handleTitleEditChange.bind(this);
         this.handleTitleEditSubmit = this.handleTitleEditSubmit.bind(this);
         this.handleTitleEditCancel = this.handleTitleEditCancel.bind(this);
     } 
 
-    handleTitleEdit(event) {
+    handleTitleEditChange(event) {
 
-        let sWho = "PostsListComponent::handleTitleEdit"
+        let sWho = "PostsListComponent::handleTitleEditChange"
 
 	    const target = event.target;
         //logajohn.debug(`${sWho}(): target = `, customStringify(target) )
@@ -66,7 +66,7 @@ class PostsListComponent extends Component {
         //let { onPostEditChange }  = this.props
 	    //onPostEditChange( this.props.posts.post_is_editing_id, postEdited ) 
 
-    }/* handleTitleEdit() */
+    }/* handleTitleEditChange() */
 
     handleTitleEditCancel(event) {
 
@@ -98,17 +98,22 @@ class PostsListComponent extends Component {
     }
 
     /* Dispatch edit action to begin editing a post... */
-    editStart(id){
+    editStart(post_id){
         let sWho = 'PostsListComponent::editStart';
-        logajohn.debug(`${sWho}(): id=`, id )
+        logajohn.debug(`${sWho}(): post_id=`, post_id )
         const { onPostEditStart } = this.props; // Get dispatch method from props...via the magic of connect() in containers.js... 
-        onPostEditStart( id ) 
+        onPostEditStart( post_id ) 
     }
 
     /* State derived from props -- Oh my!...but only when we begin editing a post... */
     componentDidUpdate(prevProps) {
 
         let sWho = "PostsListComponent::componentDidUpdate"
+
+        if( this.props.componentDidUpdateSpy ){
+            // You can use this intrusive spy to check on calls to componentDidUpdate, and also to ascertain state and props...
+            this.props.componentDidUpdateSpy({'prevProps': {...prevProps}, 'currProps': {...this.props}, 'prevState': {...prevState}, 'currState': {...this.state}})
+        }
 
         // Don't forget to compare props...!
         if (this.props.posts.post_is_editing_id !== prevProps.posts.post_is_editing_id 
@@ -286,7 +291,7 @@ class PostsListComponent extends Component {
                         <tbody>
                       {
                                 posts.posts_list.map((post, index) => (
-                                  <tr key={post.id} className={posts.post_is_editing && post.id == posts.post_is_editing_id ? "selected" : ""} onClick={()=>{this.editStart(post.id)}}>
+                                  <tr id={'post-'+post.id} key={post.id} className={posts.post_is_editing && post.id == posts.post_is_editing_id ? "selected" : ""} onClick={()=>{this.editStart(post.id)}}>
                                       <td style={{...tdStyle, textAlign: 'center', width: '10%'}} id ={'user-id-' + post.id} key={'user-id-' + post.id}>{post.userId}</td>
                                       <td style={{...tdStyle, width: '23%'}} id ={'title-' + post.id} key={'title-' + post.id}>
                                       {
@@ -294,8 +299,8 @@ class PostsListComponent extends Component {
                                        <form className="post-edit-title-form form-vertical" onSubmit={this.handleTitleEditSubmit}>
                                         <input type="text" className="form-control" id="title-edit" name="titleEdit"
                                          aria-label="Title Edit" size="40" value={this.state.postIsEditingPost.title}
-                                         onChange={this.handleTitleEdit} />
-                                         <button type="button" class="btn btn-success btn-sm" onClick={this.handleTitleEditSubmit}>OK</button><button type="button" class="btn btn-default btn-sm" onClick={this.handleTitleEditCancel}>Cancel</button>
+                                         onChange={this.handleTitleEditChange} />
+                                         <button type="button" id="title-edit-ok-button" class="btn btn-success btn-sm" onClick={this.handleTitleEditSubmit}>OK</button><button type="button" id="title-edit-cancel-button" class="btn btn-default btn-sm" onClick={this.handleTitleEditCancel}>Cancel</button>
                                        </form> )
                                        :
                                        post.title

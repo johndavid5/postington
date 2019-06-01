@@ -10,6 +10,7 @@ const { shallow, mount } = Enzyme
 
 import { config } from '../../../src/config'
 import { logajohn } from '../../../src/lib/logajohn'
+import { utils } from '../../../src/lib/utils'
 import { customStringify } from '../../../src/lib/utils'
 
 let sWhere = "__tests__/components/ui/PostsListComponent.test.js"
@@ -18,7 +19,7 @@ logajohn.setLevel(config.DEBUG_LEVEL)
 logajohn.debug(`${sWhere}: logajohn.getLevel()=${logajohn.getLevel()}...`)
 
 
-describe("<PostsListComponent /> UI Component", () => {
+describe.skip("<PostsListComponent /> UI Component", () => {
 
     let sWhat = `${sWhere}::<PostsListComponent /> UI Component`
 
@@ -80,56 +81,7 @@ describe("<PostsListComponent /> UI Component", () => {
     })
 
 
-    //it('renders table of posts if posts.posts_list is populated...', () => {
 
-        //let sWho = `${sWhat}: renders table of posts if posts.posts_list is populated...`
-        let sWho = `${sWhat}: renders table of posts if posts.posts_list is populated...`
-        let sDesc = `renders table of posts if posts.posts_list is populated...`
-        
-        let postsProp = {posts_list: postsFixture.array}
-        let wrapper = mount(<PostsListComponent posts={postsProp} />)
-        logajohn.debug(`${sWho} -- SHEMP: Moe, postsFixture = `, JSON.stringify(postsFixture, null, ' ') )
-        logajohn.debug(`${sWho} -- SHEMP: Moe, postsProp = `, JSON.stringify(postsProp, null, ' ') )
-        logajohn.debug(`${sWho} -- SHEMP: Moe, postsFixture.array = `, postsFixture.array )
-        logajohn.debug(`${sWho} -- SHEMP: Moe, postsFixture.array.length = `, postsFixture.array.length )
-
-        logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.html() = `, wrapper.html() )
-        logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.find('#posts-table').html() = `, wrapper.find('#posts-table').html() )
-        it( sDesc + '#posts-table element exists...', ()=>{
-            expect(wrapper.find('#posts-table').length).toBe(1)
-        })
-
-        it( sDesc + 'number of <tr> elements == postsFixture.array.lengty + 1 (+1 because extra <tr> with <th> headings)', ()=>{
-            let num_rows = wrapper.find('#posts-table').find('tr').length
-            logajohn.debug(`${sWho} -- SHEMP: Moey, wrapper.find('#posts-table').find('tr').length = `, num_rows )
-
-           // postsFixture.length+1 because of extra <tr> with <th> headings...
-           expect(wrapper.find('#posts-table').find('tr').length).toBe(postsFixture.array.length+1)
-        }) 
-
-        // Check for '#title-<id1>', '#title-<id2>', ...
-        // Check for '#body-<id1>', '#body-<id2>', ...
-        postsFixture.array.forEach((faux_post,index)=>{
-
-            //logajohn.debug(`${sWho} -- SHEMP: Moe, faux_post[${index}] = `, faux_post )
-
-            [{field: 'userId', id_prefix: 'user-id'}, {field: 'title', id_prefix: 'title'}, {field: 'body', id_prefix: 'body'}].forEach(({field, id_prefix})=>{
-                let le_id = '#'+ id_prefix + '-' + faux_post.id
-                logajohn.debug(`${sWho} -- SHEMP: Moe, field='${field}', id_prefix='${id_prefix}', le_id='${le_id}'...`) 
-                logajohn.debug(`${sWho} -- SHEMP: Moe, look for id = '${le_id}' in dhere, Moe...`)
-                ////logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.find(${le_id}) = `, customStringify(wrapper.find(le_id)) )
-                //logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.find(${le_id}).length = `, wrapper.find(le_id).length )
-                logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.find(${le_id}).length = '${wrapper.find(le_id).length}'...`)
-                logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.find(${le_id}).text() = '${wrapper.find(le_id).text()}'...`)
-                logajohn.debug(`${sWho} -- SHEMP: Moe, does wrapper.find(${le_id}).text() equal faux_post[field='${field}'] = `, faux_post[field],`...?`)
-                it( sDesc + `find '${le_id}' in table...`, ()=>{
-                    expect(wrapper.find(le_id).length).toBe(1)
-                    expect(wrapper.find(le_id).text()).toEqual(""+faux_post[field]) // coerce to string if necessary...
-                })
-            })
-        })
-
-    //})
 
     it("does not render table of posts if posts.posts_list is nonexistent...", () => {
         let wrapper = mount(<PostsListComponent posts={{}} />)
@@ -186,3 +138,103 @@ describe("<PostsListComponent /> UI Component", () => {
     })
 
 })
+
+describe.skip('<PostsListComponent /> - table rendering', ()=>{
+
+        let sWhat =  '<PostsListComponent /> - table rendering'
+
+        let sWho = `${sWhat}: renders table of posts if posts.posts_list is populated...`
+        let sDesc = `renders table of posts if posts.posts_list is populated...`
+        
+        let postsProp = {posts_list: postsFixture.array}
+        let wrapper = mount(<PostsListComponent posts={postsProp} />)
+        logajohn.debug(`${sWho} -- SHEMP: Moe, postsFixture = `, JSON.stringify(postsFixture, null, ' ') )
+        logajohn.debug(`${sWho} -- SHEMP: Moe, postsProp = `, JSON.stringify(postsProp, null, ' ') )
+        logajohn.debug(`${sWho} -- SHEMP: Moe, postsFixture.array = `, postsFixture.array )
+        logajohn.debug(`${sWho} -- SHEMP: Moe, postsFixture.array.length = `, postsFixture.array.length )
+
+        logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.html() = `, wrapper.html() )
+        logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.find('#posts-table').html() = `, wrapper.find('#posts-table').html() )
+        it( sDesc + '#posts-table element exists...', ()=>{
+            expect(wrapper.find('#posts-table').length).toBe(1)
+        })
+
+        it( sDesc + 'number of <tr> elements == postsFixture.array.lengty + 1 (+1 because extra <tr> with <th> headings)', ()=>{
+            let num_rows = wrapper.find('#posts-table').find('tr').length
+            logajohn.debug(`${sWho} -- SHEMP: Moey, wrapper.find('#posts-table').find('tr').length = `, num_rows )
+
+           // postsFixture.length+1 because of extra <tr> with <th> headings...
+           expect(wrapper.find('#posts-table').find('tr').length).toBe(postsFixture.array.length+1)
+        }) 
+
+        // Check for '#title-<id1>', '#title-<id2>', ...
+        // Check for '#body-<id1>', '#body-<id2>', ...
+        postsFixture.array.forEach((faux_post,index)=>{
+
+            //logajohn.debug(`${sWho} -- SHEMP: Moe, faux_post[${index}] = `, faux_post )
+
+            [{field: 'userId', id_prefix: 'user-id'}, {field: 'title', id_prefix: 'title'}, {field: 'body', id_prefix: 'body'}].forEach(({field, id_prefix})=>{
+                let le_id = '#'+ id_prefix + '-' + faux_post.id
+                logajohn.debug(`${sWho} -- SHEMP: Moe, field='${field}', id_prefix='${id_prefix}', le_id='${le_id}'...`) 
+                logajohn.debug(`${sWho} -- SHEMP: Moe, look for id = '${le_id}' in dhere, Moe...`)
+                ////logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.find(${le_id}) = `, customStringify(wrapper.find(le_id)) )
+                //logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.find(${le_id}).length = `, wrapper.find(le_id).length )
+                logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.find(${le_id}).length = '${wrapper.find(le_id).length}'...`)
+                logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.find(${le_id}).text() = '${wrapper.find(le_id).text()}'...`)
+                logajohn.debug(`${sWho} -- SHEMP: Moe, does wrapper.find(${le_id}).text() equal faux_post[field='${field}'] = `, faux_post[field],`...?`)
+                it( sDesc + `find '${le_id}' in table...`, ()=>{
+                    expect(wrapper.find(le_id).length).toBe(1)
+                    expect(wrapper.find(le_id).text()).toEqual(""+faux_post[field]) // coerce to string if necessary...
+                })
+            })
+        })
+
+})
+
+
+describe("<PostsListComponent /> - Edit ", () => {
+
+
+        // Use to confirm componentDidUpdate() was called,
+        // and also to spy on state since wrapper.instance().state()
+        // isn't working...
+        const _componentDidUpdateSpy = jest.fn()
+
+        const _onPostEditStartSpy = jest.fn() // Spy on connector function supplied via props.onPostEditStart()
+
+        let postsProp = {posts_list: postsFixture.array}
+        let wrapper = mount(<PostsListComponent posts={postsProp} componentDidUpdateSpy={_componentDidUpdateSpy} onPostEditStart={_onPostEditStartSpy} />) 
+
+        let clickPost = postsFixture.array[0]
+        
+        let sDesc = '(1) Clicking on a table row ultimately call the onPostEditStart( post_id ) connector dispatch method, supplying the post_id...'
+        it( sDesc, ()=>{
+            let sWho = `${sWhere}: ${sDesc}` 
+            let trWrapper = wrapper.find('#post-'+clickPost.id)
+            logajohn.debug(`${sWho} -- SHEMP: Moe, trWrapper.html() = `, trWrapper.html() )
+            expect(trWrapper.length).toBe(1)
+
+            trWrapper
+            .simulate('click')
+
+            let iLength = _onPostEditStartSpy.mock.calls.length
+            logajohn.debug(`${sWho}(): AFTER: SPOCK: Captain, _onPostEditStartSpy.mock.calls.length = `,  utils.customStringify(_onPostEditStartSpy.mock.calls.length, ' ') )
+            for( let i = 0 ; i < iLength; i++ ){
+             logajohn.debug(`${sWho}(): AFTER: SPOCK: Captain, _onPostEditStartSpy.mock.calls[${i}] = `,  utils.customStringify(_onPostEditStartSpy.mock.calls[i], ' ') )
+            }
+            expect(_onPostEditStartSpy.mock.calls[iLength-1][0]).toEqual(clickPost.id) 
+            
+            iLength = _componentDidUpdateSpy.mock.calls.length
+            logajohn.debug(`${sWho}(): AFTER: SPOCK: Captain, _componentDidUpdateSpy.mock.calls.length = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls.length, ' ') )
+            for( let i = 0 ; i < iLength; i++ ){
+             logajohn.debug(`${sWho}(): AFTER: SPOCK: Captain, _componentDidUpdateSpy.mock.calls[${i}] = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls[i], ' ') )
+            }
+
+        })
+
+        sDesc = '(2) When onPostEditStart() connector is dispatched, setting props.post_is_editing_id and props.post_is_editing, it causes state.postIsEditingPost and state.postsIsEditingId to be set via componentDidUpdate(), and also makes the edit form visible...'
+
+
+})
+
+
