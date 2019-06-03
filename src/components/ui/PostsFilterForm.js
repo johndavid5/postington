@@ -165,11 +165,11 @@ class PostsFilterForm extends Component {
 	        let sWho = "PostsFilterForm::componentDidMount";
 	        const { onPostsFetch } = this.props; // Get dispatch method from props...
 	
-	        logajohn.info(`${sWho}(): Calling onPostsFetch(), Moe...`);
+	        logajohn.debug(`${sWho}(): Calling onPostsFetch(), Moe...`);
 	
 	        onPostsFetch()
 	        .then(()=>{
-	            logajohn.info(`${sWho}(): onPostsFetch().then calling this.filterIt(), Moe...`)
+	            logajohn.debug(`${sWho}(): onPostsFetch().then calling this.filterIt(), Moe...`)
 	            this.filterIt()
 	        })
     }
@@ -214,7 +214,7 @@ class PostsFilterForm extends Component {
 	    const target = event.target;
 
 	    const titleFilterValue = target.value;
-        logajohn.info(`${sWho}(): titleFilterValue = '${titleFilterValue}'...` )
+        logajohn.debug(`${sWho}(): titleFilterValue = '${titleFilterValue}'...` )
 
         this.autoSuggestUpdate(titleFilterValue)
 
@@ -233,8 +233,8 @@ class PostsFilterForm extends Component {
 
         let autoSuggests = this.autoSuggestGetSuggestions( titleFilterValue, 'title' )
 
-        logajohn.info(`${sWho}(): autoSuggests.length = `, autoSuggests.length )
-        logajohn.info(`${sWho}(): autoSuggests = `, autoSuggests )
+        logajohn.debug(`${sWho}(): autoSuggests.length = `, autoSuggests.length )
+        logajohn.debug(`${sWho}(): autoSuggests = `, autoSuggests )
 
 	    //const name = target.name;
         //logajohn.debug(`${sWho}(): name = `, customStringify(name) )
@@ -262,10 +262,10 @@ class PostsFilterForm extends Component {
 	    this.setState( (state, props)=>{
 
 	      const titleFilterAutoSuggestIndex = target.value;
-          logajohn.info(`${sWho}(): titleFilterAutoSuggestIndex = '${titleFilterAutoSuggestIndex}'...` )
+          logajohn.debug(`${sWho}(): titleFilterAutoSuggestIndex = '${titleFilterAutoSuggestIndex}'...` )
 
 	      const titleFilterAutoSuggestString = state.titleFilterAutoSuggestArray[titleFilterAutoSuggestIndex]
-          logajohn.info(`${sWho}(): titleFilterAutoSuggestString = '${titleFilterAutoSuggestString}'...` )
+          logajohn.debug(`${sWho}(): titleFilterAutoSuggestString = '${titleFilterAutoSuggestString}'...` )
 
           let stateSetter = {
 	        titleFilter: titleFilterAutoSuggestString,
@@ -285,7 +285,7 @@ class PostsFilterForm extends Component {
     // Calculate suggestions for any given input value and field key...
     autoSuggestGetSuggestions(value, field){
         let sWho = 'autoSuggestGetSuggestions'
-        logajohn.info(`${sWho}: value = `, value )
+        logajohn.debug(`${sWho}: value = `, value )
         const inputValue = value.trim().toLowerCase();
         const inputLength = inputValue.length;
 
@@ -300,7 +300,7 @@ class PostsFilterForm extends Component {
 
             retourno = retourno.sort() // Should be string sort...
         }
-        logajohn.info(`${sWho}: returning `, retourno )
+        logajohn.debug(`${sWho}: returning `, retourno )
         return retourno
     }
 

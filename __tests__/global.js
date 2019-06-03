@@ -22,10 +22,9 @@ global.Enzyme = Enzyme
 // ...see https://github.com/jefflau/jest-fetch-mock....
 // ...actually we hacked our own in __mocks__ inspired by
 // jefflau's version...
-//global.fetch = require('jest-fetch-mock')
+// global.fetch = require('jest-fetch-mock')
 
-//window.localStorage = {}
+// window.localStorage = {}
 console.groupCollapsed = jest.fn()
 console.log = jest.fn()
 console.groupEnd = jest.fn()
-

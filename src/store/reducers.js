@@ -2,7 +2,6 @@ import C from '../constants'
 import { logajohn } from '../lib/logajohn'
 
 export const posts = (state = {}, action = { type: null }) => {
-
     const sWho = 'reducers::posts'
 
     logajohn.debug(`${sWho}(): state = `, state)
@@ -33,7 +32,7 @@ export const posts = (state = {}, action = { type: null }) => {
                 posts_filters: action.filters,
                 posts_list: action.filtered_posts,
                 posts_error: action.error,
-                posts_timestamp: action.timestamp
+                posts_timestamp: action.timestamp,
             }
 
             logajohn.debug(`${sWho}(): SHEMP: case C.POSTS_LOCAL_FILTER: Moe, Retoynin' `, JSON.stringify(returno, null, ' '))
@@ -57,7 +56,7 @@ export const posts = (state = {}, action = { type: null }) => {
                 ...state,
                 post_is_editing: action.post_is_editing,
                 post_is_editing_id: action.post_is_editing_id,
-                post_is_editing_post: action.post_is_editing_post
+                post_is_editing_post: action.post_is_editing_post,
             }
 
             logajohn.debug(`${sWho}(): SHEMP: case C.POST_EDIT_START: Moe, Retoynin' `, JSON.stringify(returno, null, ' '))
@@ -82,32 +81,30 @@ export const posts = (state = {}, action = { type: null }) => {
                 ...state,
                 post_is_editing: action.post_is_editing,
                 post_is_editing_id: action.post_is_editing_id,
-                post_is_editing_post: action.post_is_editing_post
+                post_is_editing_post: action.post_is_editing_post,
             }
 
-            if( state.post_is_editing_iteration ){
+            if (state.post_is_editing_iteration) {
                 returno.post_is_editing_iteration = state.post_is_editing_iteration + 1
-            }
-            else {
+            } else {
                 returno.post_is_editing_iteration = 1
             }
 
             // Replace element in posts_list that matches id...
-            let iWhich = returno.remote_posts_list.findIndex((val)=>{ return val.id == action.post_is_editing_id })
+            const iWhich = returno.remote_posts_list.findIndex(val => val.id == action.post_is_editing_id)
 
-            if( iWhich > -1 ){
-                let newRemotePostsList = [...returno.remote_posts_list] // It's immutable, so copy it before modifying it...
+            if (iWhich > -1) {
+                const newRemotePostsList = [...returno.remote_posts_list] // It's immutable, so copy it before modifying it...
                 newRemotePostsList[iWhich] = action.post_is_editing_post
                 returno.remote_posts_list = newRemotePostsList // Also immutable, so replace it in its entirety...
-            }
-            else{
+            } else {
                 returno.post_is_editing_err = `Can't find post with id ${action.post_is_editing_id}`
             }
-                    
+
             logajohn.debug(`${sWho}(): SHEMP: case C.POST_EDIT_FINISH: Moe, Retoynin' `, JSON.stringify(returno, null, ' '))
 
             return returno
- 
+
 
         default:
             // For default case, just return a copy of state unchanged...
@@ -116,7 +113,3 @@ export const posts = (state = {}, action = { type: null }) => {
             return returno
     }
 }
-
-
-
-

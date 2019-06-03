@@ -1,3 +1,4 @@
+import fetch from 'isomorphic-fetch'
 import { config } from '../../src/config'
 import { Posts } from '../../src/server/models/posts'
 
@@ -6,7 +7,6 @@ import { utils } from '../../src/lib/utils'
 
 import postsFixture from './fixtures/posts.json'
 
-import fetch from 'isomorphic-fetch'
 jest.mock('isomorphic-fetch') // Need to mock isomorphic-fetch when it's used within Post...
 
 logajohn.setLevel(config.DEBUG_LEVEL)
@@ -20,15 +20,15 @@ describe('Posts model - from fixture array...', () => {
     // One-time setup...
     beforeAll((done) => {
         const sWho = `${sWhere}::${sDescribe}::posts.test.js::beforeAll`
-        postsModel = new Posts({array: postsFixture.array})
+        postsModel = new Posts({ array: postsFixture.array })
         postsModel.loadPosts()
-		.then((numPosts)=>{
-          logajohn.debug(`${sWho}() SPOCK: Captain, numPosts =`, numPosts)
-          done();
-		})
+            .then((numPosts) => {
+                logajohn.debug(`${sWho}() SPOCK: Captain, numPosts =`, numPosts)
+                done()
+            })
     })
 
-    
+
     it('getPosts() - no filter...', (done) => {
         postsModel.getPosts({})
             .then((posts) => {
@@ -39,87 +39,82 @@ describe('Posts model - from fixture array...', () => {
             })
     })
 
-    
+
     it('getPosts() - by {title_filter: \'sunt\'}...', (done) => {
-      postsModel.getPosts({'title_filter': 'sunt'})
-          .then((posts) => {
-              const sWho = `${sWhere}::${sDescribe}::getPosts() - by {title_filter: 'sunt'}...`
-              logajohn.debug(`${sWho}() posts =`, posts)
-              expect(posts.length).toEqual(1)
-              done()
-          })
+        postsModel.getPosts({ title_filter: 'sunt' })
+            .then((posts) => {
+                const sWho = `${sWhere}::${sDescribe}::getPosts() - by {title_filter: 'sunt'}...`
+                logajohn.debug(`${sWho}() posts =`, posts)
+                expect(posts.length).toEqual(1)
+                done()
+            })
     })
 
     it('getPosts() - by {body_filter: \'est\'}...', (done) => {
-      postsModel.getPosts({'body_filter': 'est'})
-          .then((posts) => {
-              const sWho = `${sWhere}::${sDescribe}::getPosts() - by {body_filter: 'est'}...`
-              logajohn.debug(`${sWho}() posts =`, posts)
-              expect(posts.length).toEqual(1)
-              done()
-          })
+        postsModel.getPosts({ body_filter: 'est' })
+            .then((posts) => {
+                const sWho = `${sWhere}::${sDescribe}::getPosts() - by {body_filter: 'est'}...`
+                logajohn.debug(`${sWho}() posts =`, posts)
+                expect(posts.length).toEqual(1)
+                done()
+            })
     })
 
     it('getPosts() - by {title_filter: \'e\'}...', (done) => {
-      postsModel.getPosts({'body_filter': 'e', 'title_filter': 'e'})
-          .then((posts) => {
-              const sWho = `${sWhere}::${sDescribe}::getPosts() - by {body_filter: 'e', title_filter: 'e'}...`
-              logajohn.debug(`${sWho}() posts =`, posts)
-              expect(posts.length).toEqual(1)
-              done()
-          })
+        postsModel.getPosts({ body_filter: 'e', title_filter: 'e' })
+            .then((posts) => {
+                const sWho = `${sWhere}::${sDescribe}::getPosts() - by {body_filter: 'e', title_filter: 'e'}...`
+                logajohn.debug(`${sWho}() posts =`, posts)
+                expect(posts.length).toEqual(1)
+                done()
+            })
     })
 
     it('getPosts() - by {user_id_filter: 2}...', (done) => {
+        const sWho = `${sWhere}::${sDescribe}::getPosts() - by {user_id_filter: 2}...`
 
-      const sWho = `${sWhere}::${sDescribe}::getPosts() - by {user_id_filter: 2}...`
-
-      postsModel.getPosts({user_id_filter: 2})
-          .then((posts) => {
-              logajohn.debug(`${sWho}() posts =`, posts)
-              expect(posts.length).toEqual(2)
-              done()
-          })
+        postsModel.getPosts({ user_id_filter: 2 })
+            .then((posts) => {
+                logajohn.debug(`${sWho}() posts =`, posts)
+                expect(posts.length).toEqual(2)
+                done()
+            })
     })
 
-    let fields = ['user_id', 'title', 'body']
-    let asc_desc = ['asc', 'desc', '']
+    const fields = ['user_id', 'title', 'body']
+    const asc_desc = ['asc', 'desc', '']
 
-    fields.forEach((le_field)=>{
-        asc_desc.forEach((le_asc_desc)=>{    
-        let le_filter = { sort_by_field: le_field, sort_by_asc_desc: le_asc_desc }
-        let le_description = 'getPosts: ' + JSON.stringify(le_filter)
-        it( le_description, (done)=>{
+    fields.forEach((le_field) => {
+        asc_desc.forEach((le_asc_desc) => {
+            const le_filter = { sort_by_field: le_field, sort_by_asc_desc: le_asc_desc }
+            const le_description = `getPosts: ${JSON.stringify(le_filter)}`
+            it(le_description, (done) => {
+                const sortedPostsExpected = postsFixture.array.sort((post1, post2) => {
+                    let iComp = 0
+                    if (le_filter.sort_by_field == 'title') {
+                        iComp = utils.compareStrings(post1.title, post2.title, true, true)
+                    } else if (le_filter.sort_by_field == 'body') {
+                        iComp = utils.compareStrings(post1.body, post2.body, true, true)
+                    } else if (le_filter.sort_by_field == 'user_id') {
+                        // _Should_ be numerical...
+                        iComp = post1.userId - post2.userId
+                    }
 
-            let sortedPostsExpected = postsFixture.array.sort((post1,post2)=>{                  
- 
-               let iComp = 0
-               if( le_filter['sort_by_field'] == 'title' ){
-                  iComp = utils.compareStrings( post1.title, post2.title, true, true ) 
-               }
-               else if( le_filter['sort_by_field'] == 'body' ){
-                  iComp = utils.compareStrings( post1.body, post2.body, true, true ) 
-               }
-               else if( le_filter['sort_by_field'] == 'user_id' ){
-                  // _Should_ be numerical...
-                  iComp = post1.userId - post2.userId
-               }
- 
-               if( le_filter["sort_by_asc_desc"] == "desc" ){
-                  iComp *= -1
-               }
-               return iComp
-            })
+                    if (le_filter.sort_by_asc_desc == 'desc') {
+                        iComp *= -1
+                    }
+                    return iComp
+                })
 
-            postsModel.getPosts( le_filter )
-            .then((posts)=>{ 
-               logajohn.debug(`${le_description}() posts =`, posts)
-               expect(posts).toEqual(sortedPostsExpected)
-               done()
+                postsModel.getPosts(le_filter)
+                    .then((posts) => {
+                        logajohn.debug(`${le_description}() posts =`, posts)
+                        expect(posts).toEqual(sortedPostsExpected)
+                        done()
+                    })
             })
         })
-      })
-   })
+    })
 
     /* Any teardown, mon amis...? */
     afterAll(() => {
@@ -128,7 +123,6 @@ describe('Posts model - from fixture array...', () => {
 })
 
 describe('Posts model mocked fetch from URL...', () => {
-
     const sDescribe = 'Posts model mocked fetch from URL...'
 
     // One-time setup...
@@ -141,24 +135,22 @@ describe('Posts model mocked fetch from URL...', () => {
         fetch.mockResponse(JSON.stringify(postsFixture.array))
     })
 
-    it('loadPosts() loads from URL via fetch...', (done)=>{
-
+    it('loadPosts() loads from URL via fetch...', (done) => {
         const sWho = `${sWhere}::${sDescribe}::'loadPosts() loads from URL via fetch...'`
 
         // Should default to src = { url: config.POSTS_URL }, even though we are mocking the actual fetch()...
-        let postsModel = new Posts()
+        const postsModel = new Posts()
 
         postsModel.loadPosts()
-		.then((numPosts)=>{
-          logajohn.debug(`${sWho}() SPOCK: Captain, numPosts =`, numPosts)
-          expect(numPosts).toEqual(postsFixture.array.length)
-          done();
-		})
+            .then((numPosts) => {
+                logajohn.debug(`${sWho}() SPOCK: Captain, numPosts =`, numPosts)
+                expect(numPosts).toEqual(postsFixture.array.length)
+                done()
+            })
     })
-
 })
 
-//describe.skip('Posts model - via mocked fetch from URL...', () => {
+// describe.skip('Posts model - via mocked fetch from URL...', () => {
 //    let postsModel = null
 //
 //    const sDescribe = 'Posts model - via mocked fetch from URL...'
@@ -182,7 +174,7 @@ describe('Posts model mocked fetch from URL...', () => {
 //		})
 //    })
 //
-//    
+//
 //    it('getPosts() - no filter...', (done) => {
 //        postsModel.getPosts({})
 //            .then((posts) => {
@@ -193,7 +185,7 @@ describe('Posts model mocked fetch from URL...', () => {
 //            })
 //    })
 //
-//    
+//
 //    it('getPosts() - by {title_filter: \'sunt\'}...', (done) => {
 //      postsModel.getPosts({'title_filter': 'sunt'})
 //          .then((posts) => {
@@ -229,12 +221,12 @@ describe('Posts model mocked fetch from URL...', () => {
 //    afterAll(() => {
 //        const sWho = `${sWhere}::${sDescribe}::posts.test.js::afterAll`
 //    })
-//})
+// })
 
-/* Should we test the actual fetch...?  
+/* Should we test the actual fetch...?
 * This may be more appropriate in an end-to-end test.
 */
-//describe('Posts model - via actual fetch of URL...', () => {
+// describe('Posts model - via actual fetch of URL...', () => {
 //
 //    let postsModel = null
 //	let postsNum = -1
@@ -272,7 +264,7 @@ describe('Posts model mocked fetch from URL...', () => {
 //        expect(leError).toEqual(null)
 //        expect(bError).toEqual(false)
 //    })
-//    
+//
 //    it('getPosts() - no filter...', (done) => {
 //        postsModel.getPosts({})
 //            .then((posts) => {
@@ -291,7 +283,7 @@ describe('Posts model mocked fetch from URL...', () => {
 //            })
 //    })
 //
-//    
+//
 //    it('getPosts() - by { title.contains: \'est\'}...', (done) => {
 //      postsModel.getPosts({'title.contains': 'est'})
 //          .then((posts) => {
@@ -308,4 +300,4 @@ describe('Posts model mocked fetch from URL...', () => {
 //    afterAll(() => {
 //        const sWho = `${sWhere}::${sWhere}::afterAll`
 //    })
-//})
+// })

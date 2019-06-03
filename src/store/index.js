@@ -2,7 +2,7 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 
-//import { objectives, users, posts } from './reducers'
+// import { objectives, users, posts } from './reducers'
 import { posts } from './reducers'
 
 import { config } from '../config'
@@ -25,10 +25,10 @@ const clientLogger = store => next => (action) => {
     if (action.type) {
         let result
         console.groupCollapsed(`${sWho}(): dispatching client action`, action.type)
-        //console.log(`${sWho}(): ` + 'prev state', store.getState())
-        //console.log(`${sWho}(): ` + 'action', action)
+        // console.log(`${sWho}(): ` + 'prev state', store.getState())
+        // console.log(`${sWho}(): ` + 'action', action)
         result = next(action)
-        //console.log(`${sWho}(): ` + 'next state', store.getState())
+        // console.log(`${sWho}(): ` + 'next state', store.getState())
         console.groupEnd()
         return result
     }
@@ -38,8 +38,8 @@ const clientLogger = store => next => (action) => {
 const serverLogger = store => next => (action) => {
     const sWho = 'store/index/serverLogger'
     logajohn.info(`\n${sWho}(): ` + ' dispatching server action = ', action)
-    //console.log(`server action = `, action)
-    //console.log('\n')
+    // console.log(`server action = `, action)
+    // console.log('\n')
     return next(action)
 }
 
@@ -63,7 +63,7 @@ const middleware = server => [
 ]
 
 const storeFactory = (server = false, initialState = {}) => applyMiddleware(...middleware(server))(createStore)(
-    //combineReducers({ objectives, users, posts }),
+    // combineReducers({ objectives, users, posts }),
     combineReducers({ posts }),
     initialState,
 )
