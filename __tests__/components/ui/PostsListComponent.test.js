@@ -19,7 +19,7 @@ logajohn.setLevel(config.DEBUG_LEVEL)
 logajohn.debug(`${sWhere}: logajohn.getLevel()=${logajohn.getLevel()}...`)
 
 
-describe.skip("<PostsListComponent /> UI Component", () => {
+describe("<PostsListComponent /> UI Component", () => {
 
     let sWhat = `${sWhere}::<PostsListComponent /> UI Component`
 
@@ -139,7 +139,7 @@ describe.skip("<PostsListComponent /> UI Component", () => {
 
 })
 
-describe.skip('<PostsListComponent /> - table rendering', ()=>{
+describe('<PostsListComponent /> - table rendering', ()=>{
 
         let sWhat =  '<PostsListComponent /> - table rendering'
 
@@ -153,7 +153,7 @@ describe.skip('<PostsListComponent /> - table rendering', ()=>{
         logajohn.debug(`${sWho} -- SHEMP: Moe, postsFixture.array = `, postsFixture.array )
         logajohn.debug(`${sWho} -- SHEMP: Moe, postsFixture.array.length = `, postsFixture.array.length )
 
-        logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.html() = `, wrapper.html() )
+        logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.html() = `, utils.customStringify( wrapper.html()) )
         logajohn.debug(`${sWho} -- SHEMP: Moe, wrapper.find('#posts-table').html() = `, wrapper.find('#posts-table').html() )
         it( sDesc + '#posts-table element exists...', ()=>{
             expect(wrapper.find('#posts-table').length).toBe(1)
@@ -202,37 +202,156 @@ describe("<PostsListComponent /> - Edit ", () => {
 
         const _onPostEditStartSpy = jest.fn() // Spy on connector function supplied via props.onPostEditStart()
 
+        const _onPostEditFinishSpy = jest.fn() // Spy on connector function supplied via props.onPostEditFinish()
+
+        const _onPostEditCancelSpy = jest.fn() // Spy on connector function supplied via props.onPostEditCancel()
+
         let postsProp = {posts_list: postsFixture.array}
-        let wrapper = mount(<PostsListComponent posts={postsProp} componentDidUpdateSpy={_componentDidUpdateSpy} onPostEditStart={_onPostEditStartSpy} />) 
+        let postsListComponentWrapper = mount(<PostsListComponent posts={postsProp} componentDidUpdateSpy={_componentDidUpdateSpy} onPostEditStart={_onPostEditStartSpy} onPostEditFinish={_onPostEditFinishSpy} onPostEditCancel={_onPostEditCancelSpy} />) 
 
         let clickPost = postsFixture.array[0]
+        let editedPost = {}
         
+
+        let trWrapper = null 
+
         let sDesc = '(1) Clicking on a table row ultimately call the onPostEditStart( post_id ) connector dispatch method, supplying the post_id...'
+
         it( sDesc, ()=>{
             let sWho = `${sWhere}: ${sDesc}` 
-            let trWrapper = wrapper.find('#post-'+clickPost.id)
-            logajohn.debug(`${sWho} -- SHEMP: Moe, trWrapper.html() = `, trWrapper.html() )
+            trWrapper = postsListComponentWrapper.find('#post-'+clickPost.id)
+            logajohn.debug(`${sWho} -- SHEMP: Moe, trWrapper.html() = `, utils.customStringify( trWrapper.html() ) )
             expect(trWrapper.length).toBe(1)
 
             trWrapper
             .simulate('click')
 
             let iLength = _onPostEditStartSpy.mock.calls.length
-            logajohn.debug(`${sWho}(): AFTER: SPOCK: Captain, _onPostEditStartSpy.mock.calls.length = `,  utils.customStringify(_onPostEditStartSpy.mock.calls.length, ' ') )
+            logajohn.debug(`${sWho}(): AFTER simulatin' click: SHEMP: Moe, _onPostEditStartSpy.mock.calls.length = `,  utils.customStringify(_onPostEditStartSpy.mock.calls.length, ' ') )
             for( let i = 0 ; i < iLength; i++ ){
-             logajohn.debug(`${sWho}(): AFTER: SPOCK: Captain, _onPostEditStartSpy.mock.calls[${i}] = `,  utils.customStringify(_onPostEditStartSpy.mock.calls[i], ' ') )
+             logajohn.debug(`${sWho}(): AFTER simulatin' click: SHEMP: Moe, _onPostEditStartSpy.mock.calls[${i}] = `,  utils.customStringify(_onPostEditStartSpy.mock.calls[i], ' ') )
             }
             expect(_onPostEditStartSpy.mock.calls[iLength-1][0]).toEqual(clickPost.id) 
             
             iLength = _componentDidUpdateSpy.mock.calls.length
-            logajohn.debug(`${sWho}(): AFTER: SPOCK: Captain, _componentDidUpdateSpy.mock.calls.length = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls.length, ' ') )
+            logajohn.debug(`${sWho}(): AFTER simulatin' click: SHEMP: Moe, _componentDidUpdateSpy.mock.calls.length = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls.length, ' ') )
             for( let i = 0 ; i < iLength; i++ ){
-             logajohn.debug(`${sWho}(): AFTER: SPOCK: Captain, _componentDidUpdateSpy.mock.calls[${i}] = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls[i], ' ') )
+             logajohn.debug(`${sWho}(): AFTER simulatin' click: SHEMP: Moe, _componentDidUpdateSpy.mock.calls[${i}] = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls[i], ' ') )
             }
 
         })
 
-        sDesc = '(2) When onPostEditStart() connector is dispatched, setting props.post_is_editing_id and props.post_is_editing, it causes state.postIsEditingPost and state.postsIsEditingId to be set via componentDidUpdate(), and also makes the edit form visible...'
+        sDesc = '(2) When onPostEditStart() connector is dispatched, setting props.post_is_editing=true, props.post_is_editing_id and props.post_is_editing, it causes state.postIsEditingPost and state.postsIsEditingId to be set via componentDidUpdate(), and also makes the post edit form visible...'
+
+        it( sDesc, ()=>{
+            let sWho = `${sWhere}: ${sDesc}` 
+
+            // Edit Form not in the DOM when not in edit mode...
+            expect(postsListComponentWrapper.find('#post-edit-title-form-'+clickPost.id).length).toBe(0)
+
+            let postsPropsNew = { post_is_editing: true, post_is_editing_id: clickPost.id, post_is_editing_post: { ...clickPost }, posts_list: postsFixture.array }
+
+            logajohn.debug(`${sWho}(): SHEMP: Callin' postsListComponentWrapper.setProps({posts: postsPropsNew=`, postsPropsNew, `})...`)
+            postsListComponentWrapper.setProps({ posts: postsPropsNew })
+            postsListComponentWrapper.update()
+
+            let iLength = _componentDidUpdateSpy.mock.calls.length
+            logajohn.debug(`${sWho}(): AFTER dispatchin' edit props: SPOCK: Captain, _componentDidUpdateSpy.mock.calls.length = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls.length, ' ') )
+            for( let i = 0 ; i < iLength; i++ ){
+                logajohn.debug(`${sWho}(): AFTER dispatchin' edit props: SPOCK: Captain, _componentDidUpdateSpy.mock.calls[${i}/${iLength-1}] = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls[i], ' ') )
+            }
+
+
+            expect(_componentDidUpdateSpy.mock.calls[iLength-1][0]['currState']['postIsEditingId']).toEqual( postsPropsNew.post_is_editing_id )
+            expect(_componentDidUpdateSpy.mock.calls[iLength-1][0]['currState']['postIsEditingPost']).toEqual( postsPropsNew.post_is_editing_post )
+
+            logajohn.debug(`${sWho} -- SHEMP: Moe, after dispatchin' edit props, trWrapper.html() = `, utils.customStringify( trWrapper.html()) )
+
+            // Edit Form is found in the DOM when in edit mode...
+            expect(postsListComponentWrapper.find('#post-edit-title-form-'+clickPost.id).length).toBe(1)
+            expect(postsListComponentWrapper.find('#title-edit-'+clickPost.id).length).toBe(1)
+            expect(postsListComponentWrapper.find('#title-edit-ok-button-'+clickPost.id).length).toBe(1)
+            expect(postsListComponentWrapper.find('#title-edit-cancel-button-'+clickPost.id).length).toBe(1)
+
+        })
+
+        sDesc = `(3) When title edit field, '#title-edit-<post_id>' is modified, handleTitleEditChange() updates state.postIsEditingPost.title to reflect the new title value.`
+
+        it( sDesc, ()=>{
+            let sWho = `${sWhere}: ${sDesc}` 
+
+            let fauxChangeEvent = { target: { name: 'titleEdit', value: 'foo' }}
+            logajohn.debug(`${sWho}(): SHEMP: Moe, simulatin' 'change' event = `, fauxChangeEvent )
+            let titleEditWrapper = postsListComponentWrapper.find('#title-edit-'+clickPost.id)
+            titleEditWrapper.simulate('change', fauxChangeEvent )
+
+            let iLength = _componentDidUpdateSpy.mock.calls.length
+            logajohn.debug(`${sWho}(): AFTER faux change of titleEdit field:  _componentDidUpdateSpy.mock.calls.length = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls.length, ' ') )
+            for( let i = 0 ; i < iLength; i++ ){
+                logajohn.debug(`${sWho}(): AFTER faux change of titleEdit field _componentDidUpdateSpy.mock.calls[${i}/${iLength-1}] = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls[i], ' ') )
+            }
+
+            // In editedPost, title has now been set to 'foo'...
+            editedPost = {...clickPost, title: fauxChangeEvent.target.value }
+
+            // Confirm that state.postIsEditingPost has changed...
+            expect(_componentDidUpdateSpy.mock.calls[iLength-1][0]['currState']['postIsEditingPost']).toEqual( editedPost )
+
+            // Confirm that the state.postIsEditingPost has been set to 'foo'
+            expect(_componentDidUpdateSpy.mock.calls[iLength-1][0]['currState']['postIsEditingPost']['title']).toEqual( fauxChangeEvent.target.value )
+        })
+
+        sDesc = `(3) When the OK button is pressed on the post edit form, calls the props.onPostEditFinish dispatch method with arguments props.posts.post_is_editing_id, and state.postsIsEditingPost, which is the edited post...` 
+
+        it( sDesc, ()=>{
+            let sWho = `${sWhere}: ${sDesc}` 
+
+            let okButtonWrapper = postsListComponentWrapper.find('#title-edit-ok-button-'+clickPost.id)
+
+            okButtonWrapper
+            .simulate('click')
+
+            let iLength = _onPostEditFinishSpy.mock.calls.length
+            logajohn.debug(`${sWho}(): AFTER simulatin' click: SHEMP: Moe, _onPostEditFinishSpy.mock.calls.length = `,  utils.customStringify(_onPostEditFinishSpy.mock.calls.length, ' ') )
+            for( let i = 0 ; i < iLength; i++ ){
+             logajohn.debug(`${sWho}(): AFTER simulatin' click: SHEMP: Moe, _onPostEditFinishSpy.mock.calls[${i}] = `,  utils.customStringify(_onPostEditFinishSpy.mock.calls[i], ' ') )
+            }
+            expect(_onPostEditFinishSpy.mock.calls[iLength-1][0]).toEqual(clickPost.id) 
+            expect(_onPostEditFinishSpy.mock.calls[iLength-1][1]).toEqual(editedPost) 
+            
+            iLength = _componentDidUpdateSpy.mock.calls.length
+            logajohn.debug(`${sWho}(): AFTER simulatin' click: SHEMP: Moe, _componentDidUpdateSpy.mock.calls.length = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls.length, ' ') )
+            for( let i = 0 ; i < iLength; i++ ){
+             logajohn.debug(`${sWho}(): AFTER simulatin' click: SHEMP: Moe, _componentDidUpdateSpy.mock.calls[${i}] = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls[i], ' ') )
+            }
+
+        })
+
+        sDesc = '(4) If Cancel button is hit on Post Edit form, it dispatches onPostEditCancel( post_is_editing_id )...' 
+
+        it( sDesc, ()=>{
+            let sWho = `${sWhere}: ${sDesc}` 
+
+            let cancelButtonWrapper = postsListComponentWrapper.find('#title-edit-cancel-button-'+clickPost.id)
+
+            cancelButtonWrapper
+            .simulate('click')
+
+            iLength = _onPostEditCancelSpy.mock.calls.length
+            logajohn.debug(`${sWho}(): AFTER simulatin' click: SHEMP: Moe, _onPostEditCancelSpy.mock.calls.length = `,  utils.customStringify(_onPostEditCancelSpy.mock.calls.length, ' ') )
+            for( let i = 0 ; i < iLength; i++ ){
+             logajohn.debug(`${sWho}(): AFTER simulatin' click: SHEMP: Moe, _onPostEditCancelSpy.mock.calls[${i}] = `,  utils.customStringify(_onPostEditCancelSpy.mock.calls[i], ' ') )
+            }
+            expect(_onPostEditCancelSpy.mock.calls[iLength-1][0]).toEqual(clickPost.id) 
+            
+            let iLength = _componentDidUpdateSpy.mock.calls.length
+            logajohn.debug(`${sWho}(): AFTER simulatin' click: SHEMP: Moe, _componentDidUpdateSpy.mock.calls.length = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls.length, ' ') )
+            for( let i = 0 ; i < iLength; i++ ){
+             logajohn.debug(`${sWho}(): AFTER simulatin' click: SHEMP: Moe, _componentDidUpdateSpy.mock.calls[${i}] = `,  utils.customStringify(_componentDidUpdateSpy.mock.calls[i], ' ') )
+            }
+
+        })
+
 
 
 })

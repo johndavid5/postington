@@ -94,7 +94,7 @@ class PostsListComponent extends Component {
 
 	    onPostEditFinish( this.props.posts.post_is_editing_id,  this.state.postIsEditingPost )
 
-        //this.filterIt() -- we'd better re-filter...!
+        //this.filterIt() -- re-filter...or is this overkill...?
     }
 
     /* Dispatch edit action to begin editing a post... */
@@ -106,12 +106,12 @@ class PostsListComponent extends Component {
     }
 
     /* State derived from props -- Oh my!...but only when we begin editing a post... */
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevState) {
 
         let sWho = "PostsListComponent::componentDidUpdate"
 
         if( this.props.componentDidUpdateSpy ){
-            // You can use this intrusive spy to check on calls to componentDidUpdate, and also to ascertain state and props...
+            // You can use this intrusive spy to check on calls to componentDidUpdate, and also to ascertain state...
             this.props.componentDidUpdateSpy({'prevProps': {...prevProps}, 'currProps': {...this.props}, 'prevState': {...prevState}, 'currState': {...this.state}})
         }
 
@@ -296,11 +296,11 @@ class PostsListComponent extends Component {
                                       <td style={{...tdStyle, width: '23%'}} id ={'title-' + post.id} key={'title-' + post.id}>
                                       {
                                        this.props.posts.post_is_editing && (this.props.posts.post_is_editing_id == post.id) ? (
-                                       <form className="post-edit-title-form form-vertical" onSubmit={this.handleTitleEditSubmit}>
-                                        <input type="text" className="form-control" id="title-edit" name="titleEdit"
+                                       <form id={'post-edit-title-form-' + post.id} className="post-edit-title-form form-vertical" onSubmit={this.handleTitleEditSubmit}>
+                                        <input type="text" className="form-control" id={'title-edit-'+post.id} name="titleEdit"
                                          aria-label="Title Edit" size="40" value={this.state.postIsEditingPost.title}
                                          onChange={this.handleTitleEditChange} />
-                                         <button type="button" id="title-edit-ok-button" class="btn btn-success btn-sm" onClick={this.handleTitleEditSubmit}>OK</button><button type="button" id="title-edit-cancel-button" class="btn btn-default btn-sm" onClick={this.handleTitleEditCancel}>Cancel</button>
+                                         <button type="button" id={'title-edit-ok-button-'+post.id} class="btn btn-success btn-sm" onClick={this.handleTitleEditSubmit}>OK</button><button type="button" id={'title-edit-cancel-button-'+post.id} class="btn btn-default btn-sm" onClick={this.handleTitleEditCancel}>Cancel</button>
                                        </form> )
                                        :
                                        post.title
